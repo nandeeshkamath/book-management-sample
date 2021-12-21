@@ -44,10 +44,13 @@ public class BookService {
     }
 
     public void update(Book book) {
-        if (!bookRepository.existsById(book.getId())) {
+        Optional<BookTable> oldBookOptional = bookRepository.findById(book.getId());
+        if (!oldBookOptional.isPresent()) {
             throw new NotFoundException();
         }
-        bookRepository.save(book.toBookTable());
+        BookTable newBook = book.toBookTable();
+        newBook.setCreatedAt(oldBookOptional.get().getCreatedAt());
+        bookRepository.save(newBook);
     }
 
     public void delete(long id) {
